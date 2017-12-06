@@ -20,7 +20,7 @@ use common::ui::{Status, UI};
 use {PRODUCT, VERSION};
 use error::{Error, Result};
 
-use super::promote::get_ident_list;
+use super::promote::get_ident_list; // XXX should this be moved out of PROmote?
 
 pub fn start(
     ui: &mut UI,
@@ -58,7 +58,7 @@ pub fn start(
     }
 
     let question = format!(
-        "Demoting {} package(s) to channel '{}'. Continue?",
+        "Demoting {} package(s) from channel '{}'. Continue?",
         idents.len(),
         channel
     );
@@ -70,14 +70,22 @@ pub fn start(
 
     ui.status(
         Status::Demoting,
-        format!("job group {} to channel '{}'", group_id, channel),
+        format!(
+            "job group {} from channel '{}'",
+            group_id,
+            channel
+        ),
     )?;
 
     match api_client.job_group_demote(gid, &idents, channel, token) {
         Ok(_) => {
             ui.status(
                 Status::Demoted,
-                format!("job group {} to channel '{}'", group_id, channel),
+                format!(
+                    "job group {} from channel '{}'",
+                    group_id,
+                    channel
+                ),
             )?;
         }
         Err(api_client::Error::APIError(StatusCode::UnprocessableEntity, _)) => {

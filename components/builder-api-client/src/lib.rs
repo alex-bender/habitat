@@ -207,7 +207,7 @@ impl Client {
             .send()
             .map_err(Error::HyperError)?;
 
-        if res.status != StatusCode::Ok {
+        if res.status != StatusCode::NoContent {
             debug!("Failed to demote group, status: {:?}", res.status);
             return Err(err_from_response(res));
         }

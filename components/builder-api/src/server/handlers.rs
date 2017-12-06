@@ -209,7 +209,7 @@ pub fn job_group_demote(req: &mut Request) -> IronResult<Response> {
         None => return Ok(Response::with(status::BadRequest)),
     };
 
-    let idents = match req.get::<bodyparser::Struct<GroupPromoteReq>>() {
+    let idents = match req.get::<bodyparser::Struct<GroupDemoteReq>>() {
         Ok(Some(gpr)) => Some(gpr.idents),
         Ok(None) => None,
         Err(err) => {
@@ -597,7 +597,7 @@ pub fn project_create(req: &mut Request) -> IronResult<Response> {
             }
             (token, body.repo_id)
         }
-        _ => return Ok(Response::with(status::UnprocessableEntity));
+        _ => return Ok(Response::with(status::UnprocessableEntity)),
     };
 
     let origin = match route_message::<OriginGet, Origin>(req, &origin_get) {

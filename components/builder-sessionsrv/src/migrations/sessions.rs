@@ -12,6 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+
+// DO NOT USE THIS TABLE - IT HAS BEEN DEPRECATED AND DROPPED
+
 use db::migration::Migrator;
 
 use error::SrvResult;
@@ -120,5 +123,47 @@ pub fn migrate(migrator: &mut Migrator) -> SrvResult<()> {
                  $$"#)?;
     migrator.migrate("accountsrv",
                  r#"ALTER TABLE IF EXISTS account_sessions DROP CONSTRAINT IF EXISTS account_sessions_account_id_fkey"#)?;
+
+    // Cleanup after table deprecation
+    migrator.migrate(
+        "accountsrv",
+        "DROP TABLE IF EXISTS account_sessions CASCADE",
+    )?;
+    migrator.migrate(
+        "accountsrv",
+        r#"DROP FUNCTION IF EXISTS insert_account_session_v2(
+                    a_account_id bigint,
+                    a_account_name text,
+                    account_token text,
+                    account_provider text,
+                    account_extern_id bigint,
+                    account_is_admin bool,
+                    account_is_early_access bool,
+                    account_is_build_worker bool
+                 ) CASCADE"#,
+    )?;
+    migrator.migrate(
+        "accountsrv",
+        "DROP FUNCTION IF EXISTS get_account_session_v2 (account_token text) CASCADE",
+    )?;
+    migrator.migrate(
+        "accountsrv",
+        r#"DROP FUNCTION IF EXISTS get_account_session_v1 (
+                    account_name text,
+                    account_token text
+                 ) CASCADE"#,
+    )?;
+    migrator.migrate(
+        "accountsrv",
+        r#"DROP FUNCTION IF EXISTS insert_account_session_v1 (
+                    a_account_id bigint,
+                    account_token text,
+                    account_provider text,
+                    account_extern_id bigint,
+                    account_is_admin bool,
+                    account_is_early_access bool,
+                    account_is_build_worker bool
+                 ) CASCADE"#,
+    )?;
     Ok(())
 }
